@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Users List{% endblock %}
+
+{% block content %}
+<script type="text/javascript" src="{{ STATIC_URL }}bootstrap/js/panel.js"></script>
+
+
+<h3 class="text-dark-green">User Management</h3>
+<p>Here, you can add, edit or delete users.</p>
+
+<!-- Users Table -->
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">Users</h3>
+        <div class="pull-right">
+            <span class="clickable"><a href="{% url 'users-clear-faculty' %}">Delete All Faculty <i class="glyphicon glyphicon-remove"></i></a></span>
+            <span class="clickable"><a href="{% url 'users-clear-tas' %}">Delete All TAs <i class="glyphicon glyphicon-remove"></i></a></span>
+            <span class="clickable"><a href="{% url 'users-upload' %}">Import TA <i class="glyphicon glyphicon-cloud-upload"></i></a></span>
+            <span class="clickable add_user"><a href="{% url 'users-create' %}">Add User</a><i class="glyphicon glyphicon-plus"></i>
+            </span>
+        </div>
+    </div>
+    <div class="panel-body">
+        <table class="table table-hover" id="user-table">
+            <thead class="text-dark-green">
+                <tr>
+                    <th class="col-md-2">Username</th>
+                    <th class="col-md-4">Full name</th>
+                    <th class="col-md-2">Admin</th>
+                    <th class="col-md-2">Faculty</th>
+                    <th class="col-md-2">TA</th>
+                </tr>
+                <tr id="search_box">
+                    <td colspan="5">
+                        <input type="text" class="form-control" id="course-table-filter" data-action="filter" data-filters="#user-table" placeholder="Filter Users" />
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+            {% if users.count %}
+                {% for user in users %}
+                    <tr>
+                        <td class="col-md-2">
+                            <a data-toggle="modal" data-target="#delete_modal{{ user.id }}" title="Delete" >
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </a>
+                            <div class="modal fade" id="delete_modal{{ user.id }}" role="dialog">
+                                <div class="modal-dialog ">
+                                    {% include 'users/modal.html' %}
+                                </div>
+                            </div>
+                            <a href="{% url 'users-edit' user.id %}">
+                                {{ user.username }}
+                            </a>
+                        </td>
+                        <td class="col-md-4">{{ user }}</td>
+                        {% if user.is_staff %}
+                            <td class="col-md-2"><i class="glyphicon glyphicon-ok"></i></td>
+                        {% else %}
+                            <td class="col-md-2"><i class="glyphicon glyphicon-remove"></i></td>
+                        {% endif %}
+
+                        {% if user.is_faculty %}
+                            <td class="col-md-2"><i class="glyphicon glyphicon-ok"></i></td>
+                        {% else %}
+                            <td class="col-md-2"><i class="glyphicon glyphicon-remove"></i></td>
+                        {% endif %}
+                        {% if user.is_ta %}
+                            <td class="col-md-2"><i class="glyphicon glyphicon-ok"></i></td>
+                        {% else %}
+                            <td class="col-md-2"><i class="glyphicon glyphicon-remove"></i></td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="4">There are no users!</td>
+            </tr>
+            {% endif %}
+        </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

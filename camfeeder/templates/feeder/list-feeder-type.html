@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<script type="text/javascript" src="{{ STATIC_URL }}bootstrap/js/panel.js"></script>
+    
+<h3 class="text-dark-green">META DATA: Feeder Type</h3>
+<p>Feeder Type is used to dist</p>
+
+
+
+{% if has_feeder_type %}
+<div class="panel panel-primary">
+    <div class="panel-body">
+        <table class="table table-hover" id="feeder-table">
+            <thead class="text-dark-green">
+                <tr>
+                    <th class="col-md-2">ID</th>
+                    <th class="col-md-4">Feeder Type</th>
+                    <th class="col-md-3">Who created</th>
+                    <th class="col-md-3">Edit</th>
+                </tr>
+                <tr id="search_box" >
+                    <td colspan="12">
+                    <input type="text" class="form-control" id="feeder-table-filter" data-action="filter" data-filters="#feeder-table" placeholder="Filter Feeder Type" /></td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for feeder_type in feeder_types %}
+                <tr>
+                    <td class="col-md-2">{{ feeder_type.id }}</td>
+                    <td class="col-md-4">{{ feeder_type.feeder_type }}</td>
+                    <td class="col-md-3">{{ feeder_type.who_created }}</td>
+                    <td class="col-md-3"><a class="btn btn-primary" href="{% url 'feeder-type-edit' feeder_type.id %}">Edit</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    There are no feeder type currently listed.
+</div>
+{% endif %}
+    
+{% endblock %}
