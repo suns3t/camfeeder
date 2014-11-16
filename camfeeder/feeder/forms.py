@@ -37,7 +37,7 @@ class TransactionForm(forms.ModelForm):
         return Status.objects.get(id=status.id)
 
     def save(self, commit, request):
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         form = super(TransactionForm,self).save(commit=False)
         form.user = request.user
         

@@ -13,6 +13,7 @@ urlpatterns = patterns('',
     
     url(r'^$', feeder.list_, name='feeder-list'),
     url(r'^feeder/add/$', feeder.add_feeder, name='feeder-add'),
+    url(r'^feeder/edit/(?P<id>\d+)/$', feeder.add_feeder, name='feeder-edit'),
     url(r'^location/add/$', feeder.add_location, name='location-add'),
     url(r'^feeder-type/$', feeder.list_feeder_type, name='feeder-type-list'),
     url(r'^feeder-type/add/$', feeder.edit_feeder_type, name='feeder-type-add'),

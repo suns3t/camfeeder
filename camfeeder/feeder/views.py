@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib import messages
 
 from .forms import TransactionForm, LocationForm, StatusForm, FeederTypeForm
-from .models import Feeder, FeederType, Location, Status
+from .models import Feeder, FeederType, Location, Status, Transaction
 # Create your views here.
 
 def list_(request):
@@ -27,20 +27,28 @@ def list_feeder_type(request):
         'has_feeder_type' : has_feeder_type,
     })
 
-def add_feeder(request):
-    page_title = "Add a new feeder"
+def add_feeder(request, id=None):
+    page_title = "Add or Edit a feeder"
     
+    if id:
+        transaction = Transaction.objects.filter(feeder__id=id).first()
+    else:
+        transaction = Transaction()
+
     if request.POST:
-        transaction_form = TransactionForm(request, request.POST)
+        transaction_form = TransactionForm(request, request.POST, instance=transaction)
         if transaction_form.is_valid():
             transaction = transaction_form.save(commit=False, request=request)
             transaction.save()
             transaction_form.save_m2m()
-            messages.success(request, "New feeder added!")
+            if id:
+                messages.success(request, "Feeder is edited")
+            else:
+                messages.success(request, "New feeder added!")
 
             return HttpResponseRedirect(reverse('feeder-list'))
     else:
-        transaction_form = TransactionForm(request)
+        transaction_form = TransactionForm(request, instance=transaction)
 
     return render(request, 'feeder/create.html', {
         'transaction_form' :  transaction_form,
