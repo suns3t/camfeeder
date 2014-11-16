@@ -21,7 +21,8 @@ class TransactionForm(forms.ModelForm):
         self.fields['type'].widget.attrs['class'] = 'form-control'
         self.fields['location'].widget.attrs['class'] = 'form-control'
         self.fields['status'].widget.attrs['class'] = 'form-control'
-
+        if instance:
+            self.fields['barcode'].initial = instance.feeder.barcode
     def clean_type(self):
         type = self.cleaned_data.get('type')
 

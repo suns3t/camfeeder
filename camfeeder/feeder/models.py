@@ -46,6 +46,7 @@ class Transaction(models.Model):
     id = models.AutoField(primary_key=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     feeder = models.ForeignKey(Feeder)
+    feeder_type = models.ForeignKey(FeederType)
     status = models.ForeignKey(Status)
     user = models.ForeignKey(User)
     location = models.ForeignKey(Location)

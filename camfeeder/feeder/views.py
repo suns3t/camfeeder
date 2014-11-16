@@ -34,6 +34,7 @@ def add_feeder(request, id=None):
         transaction = Transaction.objects.filter(feeder__id=id).first()
     else:
         transaction = Transaction()
+    import pdb; pdb.set_trace();
 
     if request.POST:
         transaction_form = TransactionForm(request, request.POST, instance=transaction)
