@@ -9,7 +9,7 @@
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}select2-3.4.6/select2.css">
 <script type="text/javascript">
     $(document).ready(function() {
-        $("#id_type").select2({
+        $("#id_feeder_type").select2({
             placeholder: "Feeder type",
             allowClear: true
         });
@@ -49,9 +49,9 @@
         </div>
     </div>
     <div class="row form-group">
-        <label class="control-label col-md-2">{{ transaction_form.type.label }}</label>
+        <label class="control-label col-md-2">{{ transaction_form.feeder_type.label }}</label>
         <div class="col-md-9">
-            {{ transaction_form.type }}
+            {{ transaction_form.feeder_type }}
         </div>
     </div>
     <div class="row form-group">

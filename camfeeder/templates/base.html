@@ -29,8 +29,14 @@
                                 <li>
                                     Feeder
                                 </li>
-                               
                                 <li class="nav-divider"></li>
+                                <li>
+                                    <a href="{% url 'feeder-type-list' %}" class="tab">
+                                        <i class="glyphicon glyphicon-list-alt"></i>
+                                         Feeder Type
+                                    </a>
+                                </li>
+                                
                                 {% if user.is_active %}
                                     {% if user.is_staff %}
                                     <li>

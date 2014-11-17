@@ -12,6 +12,13 @@ def list_(request):
     feeders = Feeder.objects.all()
     has_feeder = feeders.count()
 
+    for feeder in feeders:
+        latest_transaction = Transaction.objects.filter(feeder=feeder).first()
+
+        feeder.feeder_type = latest_transaction.feeder_type
+        feeder.location = latest_transaction.location
+        feeder.status = latest_transaction.status
+
     return render(request, 'home.html', {
         'feeders' : feeders,
         'has_feeder' : has_feeder,
@@ -29,12 +36,12 @@ def list_feeder_type(request):
 
 def add_feeder(request, id=None):
     page_title = "Add or Edit a feeder"
-    
+    # import pdb; pdb.set_trace()
+
     if id:
         transaction = Transaction.objects.filter(feeder__id=id).first()
     else:
-        transaction = Transaction()
-    import pdb; pdb.set_trace();
+        transaction = None
 
     if request.POST:
         transaction_form = TransactionForm(request, request.POST, instance=transaction)

@@ -11,32 +11,23 @@ class TransactionForm(forms.ModelForm):
     list_of_location = Location.objects.all()
     list_of_status = Status.objects.filter(id__gt=1)
 
-    type = forms.ModelChoiceField(label="Type", required=True, queryset=list_of_type)
+    feeder_type = forms.ModelChoiceField(label="Type", required=True, queryset=list_of_type)
     location = forms.ModelChoiceField(label="Location", required=True, queryset=list_of_location)
     status = forms.ModelChoiceField(label="Status", required=True, queryset=list_of_status)
     
     def __init__(self, request, *args, **kwargs):
+        barcode_data = None
+        if kwargs.get('instance'):
+            barcode_data = kwargs['instance'].feeder.barcode
+        
         super(TransactionForm, self).__init__(*args, **kwargs)
         self.request = request
-        self.fields['type'].widget.attrs['class'] = 'form-control'
+        self.fields['feeder_type'].widget.attrs['class'] = 'form-control'
         self.fields['location'].widget.attrs['class'] = 'form-control'
         self.fields['status'].widget.attrs['class'] = 'form-control'
-        if instance:
-            self.fields['barcode'].initial = instance.feeder.barcode
-    def clean_type(self):
-        type = self.cleaned_data.get('type')
-
-        return FeederType.objects.get(id=type.id)
-
-    def clean_location(self):
-        location = self.cleaned_data.get('location')
-
-        return Location.objects.get(id=location.id)
-
-    def clean_status(self):
-        status = self.cleaned_data.get('status')
-        return Status.objects.get(id=status.id)
-
+        
+        if barcode_data:
+            self.fields['barcode'].initial = barcode_data
     def save(self, commit, request):
         # import pdb; pdb.set_trace()
         form = super(TransactionForm,self).save(commit=False)
@@ -44,16 +35,14 @@ class TransactionForm(forms.ModelForm):
         
         # Get data for feeder
         barcode = self.cleaned_data['barcode']
-
         try:
             feeder = Feeder.objects.get(barcode=barcode)
         except:
-            feeder = Feeder(who_created=request.user, barcode=self.cleaned_data['barcode'])
+            feeder = Feeder(who_created=request.user, barcode=barcode)
             feeder.save()
-            form.feeder = feeder
-        else:
-            form.feeder = feeder
 
+        form.feeder = feeder
+        
         if commit:
             form.save()
         return form
@@ -61,9 +50,10 @@ class TransactionForm(forms.ModelForm):
 
     class Meta:
         model = Transaction
-        fields = (
+        
+        fields = (  
             'barcode',
-            'type',
+            'feeder_type',
             'location',
             'status'
         )

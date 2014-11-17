@@ -19,9 +19,12 @@
         <table class="table table-hover" id="feeder-table">
             <thead class="text-dark-green">
                 <tr>
-                    <th class="col-md-2">ID</th>
-                    <th class="col-md-4">Barcode</th>
-                    <th class="col-md-3">User added</th>
+                    <th class="col-md-1">ID</th>
+                    <th class="col-md-1">Barcode</th>
+                    <th class="col-md-2">Feeder Type</th>
+                    <th class="col-md-1">Location</th>
+                    <th class="col-md-2">Status</tj>
+                    <th class="col-md-2">User added</th>
                     <th class="col-md-3"></th>
                 </tr>
                 <tr id="search_box" >
@@ -32,10 +35,15 @@
             <tbody>
                 {% for feeder in feeders %}
                 <tr>
-                    <td class="col-md-2">{{ feeder.id }}</td>
-                    <td class="col-md-4">{{ feeder.barcode }}</td>
-                    <td class="col-md-3">{{ feeder.who_created }}</td>
-                    <td class="col-md-3"><a class="btn btn-primary" href="{% url "feeder-edit" feeder.id %}">Edit</a></td>
+                    <td class="col-md-1">{{ feeder.id }}</td>
+                    <td class="col-md-1"><a href="{% url "feeder-edit" feeder.id %}">{{ feeder.barcode }}</a></td>
+                    <td class="col-md-2">{{ feeder.feeder_type }}</td>
+                    <td class="col-md-1">{{ feeder.location }}</td>
+                    <td class="col-md-2">{{ feeder.status }}</td>
+                    <td class="col-md-2">{{ feeder.who_created }}</td>
+                    <td class="col-md-3">
+                        <a class="btn btn-primary" href="{% url "feeder-edit" feeder.id %}">Repair History</a>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -46,10 +54,12 @@
 <div class="alert alert-info">
     There are no feeder currently listed.
 </div>
+
+{% endif %}
+
+------------------------------------- Function to demo, will not be used in production ----------------------<br/>
 <a href="{% url 'feeder-add' %}" class="btn btn-default pull-right">Add a feeder</a>
 <a href="{% url 'location-add' %}" class="btn btn-default pull-right">New location</a>
 <a href="{% url 'status-add' %}" class="btn btn-default pull-right">New status</a>
 <a href="{% url 'feeder-type-add' %}" class="btn btn-default pull-right">New type</a>
-{% endif %}
-    
 {% endblock %}
