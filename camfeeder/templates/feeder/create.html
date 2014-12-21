@@ -9,63 +9,45 @@
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}select2-3.4.6/select2.css">
 <script type="text/javascript">
     $(document).ready(function() {
-        $("#id_feeder_type").select2({
-            placeholder: "Feeder type",
+        $(".select-type").select2({
             allowClear: true
         });
         
-        $("#id_location").select2({
-            placeholder: "Feeder location",
-            allowClear: true,
-        });
-
-        $("#id_status").select2({
-            placeholder: "Feeder status",
-            allowClear: true,
-        });
     })
 </script>
 
 <form role="form" method="post" class="form-horizontal col-md-8" >
     {% csrf_token %}
     {% if transaction_form.errors %}
-        <div class="alert alert-danger">
-        {% for fields, errors in transaction_form.errors.items %}
-            {% for error in errors %}
-                {{ error }}
-            {% endfor%}
-        {% endfor %}
+        <div class="row alert alert-danger">
+            <strong>Errors detected:</strong> Please correct them before you can continue.
         </div>
     {% endif %}
     <h3 class="text-dark-green" >{{ title }}</h3>
+    
+    {% if request.user.is_MT and transaction_form.feeder %}
+    <h4>Feeder: {{ transaction_form.feeder }} - Type: {{ transaction_form.feeder_type }}</h4>
+    {% endif %}
     <p>Fill out the feeder information below:</p>
-    <div class="row form-group">
-        <label class="control-label col-md-2">{{ transaction_form.barcode.label }}</label>
-        <div class="col-md-3">
-            
+    {% for field in transaction_form.visible_fields %}
+    {% if field.errors %}
+    <div class="form-group has-error">
+    {% else %}
+    <div class="form-group">
+    {% endif %}
+        <div class="row">
+            <label class="control-label col-md-2">{{ field.label_tag }}</label>
+            <div class="col-md-8">
+                {{ field }}
+            </div>
         </div>
-        <div class="col-md-6">
-            {{ transaction_form.barcode }}
-        </div>
+        <div class="row col-md-offset-2 text-danger">
+        {{ field.errors }}
     </div>
-    <div class="row form-group">
-        <label class="control-label col-md-2">{{ transaction_form.feeder_type.label }}</label>
-        <div class="col-md-9">
-            {{ transaction_form.feeder_type }}
-        </div>
     </div>
-    <div class="row form-group">
-        <label class="control-label col-md-2">{{ transaction_form.location.label }}</label>
-        <div class="col-md-9">
-            {{ transaction_form.location }}  
-        </div>
-    </div>
-    <div class="row form-group">
-        <label class="control-label col-md-2">{{ transaction_form.status.label }}</label>
-        <div class="col-md-9">
-            {{ transaction_form.status }}  
-        </div>
-    </div>
+    
+    {% endfor %}
+    
     <div class="form-group">
         <div class="col-md-offset-2">
             <div class="col-md-4">
@@ -76,6 +58,5 @@
             </div>
         </div>
     </div>
-    
 </form>
 {% endblock %}

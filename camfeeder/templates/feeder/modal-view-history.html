@@ -1,0 +1,119 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header bg-primary">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h4 class="modal-title">Feeder History: {{ feeder.barcode }}</h4>
+        </div>
+        <div class="modal-body">
+            <ul class="nav nav-tabs">
+                <li role="presentation" class="active">
+                    <a data-toggle="tab" href="#table_{{ feeder.id }}">Table</a>
+                </li>
+                <li role="presentation">
+                    <a data-toggle="tab"href="#graph_{{ feeder.id }}" id="graph_tab_{{ feeder.id }}">Graph</a>
+                </li>
+            </ul>
+            <div class="tab-content" >
+                <div id="table_{{ feeder.id }}" class="tab-pane fade in active">
+                    <table id="table_history_{{ feeder.id }}" class="table table-striped" >
+                        <thead>
+                            <th>Timestamp</th>
+                            <th>Location</th>
+                            <th>Symptoms</th>
+                            <th>Action Takens</th>
+                            <th>User</th>
+                        </thead>
+                        {% for transaction in feeder.transactions %}
+                        <tr>
+                            <td>{{ transaction.timestamp|date:'D, d M Y'}}</td>
+                            <td>{{ transaction.location }}</td>
+                            <td>{% for symptom in transaction.symptoms.all %}
+                                {{ symptom }}<br/>
+                                {% endfor %}
+                            </td>
+                            <td>{% for action in transaction.actiontakens.all %}
+                                {{ action }}<br/>
+                                {% endfor %}
+                            </td>
+                            <td>{{ transaction.user }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                <div id="graph_{{ feeder.id }}" class="tab-pane fade"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-default"name="cancel"  data-dismiss="modal" value="Close">Close</button>
+        </div>
+    </div>
+</div>
+{% block extrajs %}
+<script src="{{ STATIC_URL }}Highcharts-4.0.4/js/highcharts.js"></script>
+{% endblock %}
+<script type="text/javascript">
+$(document).ready(function() {
+    
+    // Format DataTable for Feeder History Table
+    $('#table_history_{{ feeder.id }}').dataTable({
+            "dom" : 'rtp',
+            "tableTools": {
+                "SwfPath": "{{ STATIC }}DataTables-1.10.4/extensions/TableTools/swf/copy_csv_xls_pdf.swf"
+            }
+        });
+    
+    // Symptom Count by Categories chart format
+    var countBySymptomByFeeder = {
+        chart: {
+            renderTo: 'graph_{{ feeder.id }}',
+            type: 'line',
+        },
+        title: {text: 'Feeder Health Graph'},
+        xAxis: {
+            type: 'datetime',
+            title: {
+                text: 'Timeline'
+            },
+            minPadding: 0.06,
+            maxPadding: 0.06
+        },
+        yAxis: {
+            title: {
+                text: 'Number of error'
+            },
+            minRange: 0,
+            tickInterval: 1,
+       
+        },
+        series: [{}],
+    };
+    
+    var chartDataUrl = "/top_symptom_json_by_feeder/{{ feeder.id}}";
+    
+    // Get data for chart
+    $.getJSON(chartDataUrl,
+        function(data) {
+            if (data['chart_data']['symptom'].length > 0) {
+                for (i=0; i< data['chart_data']['symptom'].length; i++) {
+                    countBySymptomByFeeder.series[i] = {
+                        name: data['chart_data']['symptom'][i],
+                        data: data['chart_data']['data'][i]
+                    }
+                }
+                
+                countBySymptomByFeeder.chart.height = data['chart_data']['symptom'].length*50 + 100;
+                var chart = new Highcharts.Chart(countBySymptomByFeeder);
+            }
+            else {
+                $('#graph_{{ feeder.id }}').text('There is no symptom yet');
+            }
+            
+            
+    });
+    
+    $('#graph_tab_{{ feeder.id }}').on('click', function() {
+        setTimeout(function() {$(window).resize()}, 200);   
+    });
+    
+});
+
+</script>

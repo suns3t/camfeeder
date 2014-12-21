@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% block extrajs %}
+<script src="{{ STATIC_URL }}Highcharts-4.0.4/js/highcharts.js"></script>
+<script src="{{ STATIC_URL }}Highcharts-4.0.4/js/modules/exporting.js"></script>
+<script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+{% endblock %}
+<div class="row">
+    <div class="col-sm-4 col-md-4">
+        <div id="accordion" class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a class="accordion-toggle" data-toggle="collapse" data-target="#collapseBody">
+                        Options<span class="glyphicon glyphicon-chevron-up pull-right"></span>
+                    </a>
+                </h4>
+            </div>
+            <div id="collapseBody" class="panel panel-collapse collapse in" >
+                <div class="panel-body">
+                    <form id="filter_form" role="form" method="post" action="{% url 'filter_url' %}" style="margin: 5px">
+                        {% csrf_token %}
+                        {% for field in filter_form %}
+                        {% if field.errors %}
+                        <div class="form-group has-error">
+                        {% else %}
+                        <div class="form-group" >
+                        {% endif %}
+                            <label class="control-label">{{ field.label_tag }}</label>
+                            {{ field }}
+                            <div class="row text-danger">
+                                {{ field.errors }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                        <input type="submit" value="Filter" class="btn btn-primary btn-block">    
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-8 col-md-8">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h5 class="panel-title text-center">
+                            <b>Total number of Feeder</b>
+                        </h5>
+                    </div>
+                    <div class="panel-body" style="padding-bottom:24px">
+                        <h3 class="text-center">{{ no_of_feeder }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading" data-toggle="tooltip"
+                         title="Based on the average blood glucose from the last 90 days.">
+                        <h3 class="panel-title text-center">
+                            <b>Good/Bad</b>
+                        </h3>
+                    </div>
+                    <div class="panel-body" style="padding-bottom:24px">
+                        <h3 class="text-center" >{{ good }}/{{ bad }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" style="
+    padding-left: 15px;
+    padding-right: 15px;
+">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h5 class="panel-title text-center">
+                        <b>Graph</b>
+                    </h5>
+                </div>
+                <div id="chart_panel" class="panel-body" style="margin:0px"></div>
+            </div>
+        </div>
+    </div>
+</div> <!-- end row -->
+
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+    var countBySymptom = {
+        chart: {
+            renderTo: 'chart_panel',
+            type: 'column',
+        },
+        title: {text: 'All Feeder Health Graph'},
+        xAxis: {
+            type: 'datetime',
+            title: {
+                text: 'Date'
+            },
+            minPadding: 0.1,
+            maxPadding: 0.1
+        },
+        yAxis: {
+            title: {
+                text: 'Number of error'
+            },
+            min: 0,
+            
+        },
+        series: [{}],
+        
+        };
+
+    var chartDataUrl = "{% url 'top_symptom_json' %}";
+    $.getJSON(chartDataUrl,
+        function(data) {
+            for (i=0; i<data['chart_data']['symptom'].length; i++) {
+                countBySymptom.series[i] = {
+                    name: data['chart_data']['symptom'][i],
+                    data: data['chart_data']['data'][i]
+                } 
+            }
+            
+            var chart = new Highcharts.Chart(countBySymptom);
+
+    });
+    
+    $('#id_start_date').datepicker({
+        pickTime: false
+    });
+    $('#id_end_date').datepicker({
+        pickTime: false
+    });
+    
+    // For changing the icon in the Options panel
+    $('.collapse').on('shown.bs.collapse', function(){
+        $(this).parent().find(".glyphicon-chevron-down")
+            .removeClass("glyphicon-chevron-down")
+            .addClass("glyphicon-chevron-up");
+    }).on('hidden.bs.collapse', function(){
+        $(this).parent().find(".glyphicon-chevron-up")
+            .removeClass("glyphicon-chevron-up")
+            .addClass("glyphicon-chevron-down");
+    });
+    
+    // Submit the filter form and refresh the table data
+    var frm = $('#filter_form');
+    frm.submit(function () {
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: frm.serialize(),
+            success: function (data) {
+                // Reload the chart data
+                countBySymptom.series = []
+                
+                for (i=0; i<data['chart_data']['symptom'].length; i++) {
+                    countBySymptom.series[i] = {
+                        name: data['chart_data']['symptom'][i],
+                        data: data['chart_data']['data'][i]
+                    } 
+                }
+                console.log("Success", data)
+                var chart = new Highcharts.Chart(countBySymptom);
+            },
+            error: function(data) {
+                console.log("Error", data)
+                alert('Sorry, something went wrong. Please try again.');
+            }
+        });
+        return false;
+    });
+} );
+</script>
+{% endblock %}

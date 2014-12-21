@@ -67,9 +67,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'camfeeder',
         # The following settings are not used with sqlite3:
-        'USER': '',
+        'USER': 'root',
         'PASSWORD': '',
-        'HOST': '',
+        'HOST': '0.0.0.0',
     }
 }
 
@@ -91,6 +91,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
+
+LOGIN_REDIRECT_URL = '/dashboard/'
 
 STATICFILES_DIRS = (
     os.path.join(DJANGO_DIR, "static"),

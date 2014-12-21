@@ -1,55 +1,66 @@
 {% extends "base.html" %}
 
 {% block content %}
-<script type="text/javascript" src="{{ STATIC_URL }}bootstrap/js/panel.js"></script>
-    
+
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+        $('#feeder-table').dataTable({
+            "dom" : '<"btn btn-group"T>frtp',
+            "tableTools": {
+                "sSwfPath": "/static/DataTables-1.10.4/extensions/TableTools/swf/copy_csv_xls_pdf.swf",
+                "aButtons": [ "xls", "print" ]
+            }
+        });
+    } );
+</script>
+
 <h3 class="text-dark-green">CAM Feeder Management System</h3>
 <p>This application is used to manage GE feeder at CAM module</p>
 
-
-
+<h4 >List of available feeders
+    <a class="btn btn-primary pull-right" href="{% url 'feeder-add' %}">Add feeder</a>
+</h4>
+<br>
 {% if has_feeder %}
-<div class="panel panel-primary">
-    <div class="panel-heading">
-        <h3 class="panel-title">List of available feeders
-        <a class=" pull-right" href="{% url 'feeder-add' %}">Add feeder</a>
-        </h3>
-    </div>
-    <div class="panel-body">
-        <table class="table table-hover" id="feeder-table">
-            <thead class="text-dark-green">
-                <tr>
-                    <th class="col-md-1">ID</th>
-                    <th class="col-md-1">Barcode</th>
-                    <th class="col-md-2">Feeder Type</th>
-                    <th class="col-md-1">Location</th>
-                    <th class="col-md-2">Status</tj>
-                    <th class="col-md-2">User added</th>
-                    <th class="col-md-3"></th>
-                </tr>
-                <tr id="search_box" >
-                    <td colspan="12">
-                    <input type="text" class="form-control" id="feeder-table-filter" data-action="filter" data-filters="#feeder-table" placeholder="Filter Feeders" /></td>
-                </tr>
-            </thead>
-            <tbody>
-                {% for feeder in feeders %}
-                <tr>
-                    <td class="col-md-1">{{ feeder.id }}</td>
-                    <td class="col-md-1"><a href="{% url "feeder-edit" feeder.id %}">{{ feeder.barcode }}</a></td>
-                    <td class="col-md-2">{{ feeder.feeder_type }}</td>
-                    <td class="col-md-1">{{ feeder.location }}</td>
-                    <td class="col-md-2">{{ feeder.status }}</td>
-                    <td class="col-md-2">{{ feeder.who_created }}</td>
-                    <td class="col-md-3">
-                        <a class="btn btn-primary" href="{% url "feeder-edit" feeder.id %}">Repair History</a>
-                    </td>
-                </tr>
+
+<table class="table table-striped table-bordered" cellspacing="0" width="100%" id="feeder-table">
+    <thead class="text-dark-green">
+        <tr>
+            <th class="col-md-1">ID</th>
+            <th class="col-md-1">Barcode</th>
+            <th class="col-md-2">Feeder Type</th>
+            <th class="col-md-1">Location</th>
+            <th class="col-md-2">Status</th>
+            <th class="col-md-2">Failure Mode</th>
+            <th class="col-md-3"></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for feeder in feeders %}
+        <tr>
+            <td class="col-md-1">{{ feeder.id }}</td>
+            <td class="col-md-1"><a href="{% url 'feeder-edit' feeder.id %}">{{ feeder.barcode }}</a></td>
+            <td class="col-md-2">{{ feeder.feeder_type }}</td>
+            <td class="col-md-1">{{ feeder.location }}</td>
+            <td class="col-md-2">{% if feeder.status %} Good {% else %} Bad {% endif %}</td>
+            <td class="col-md-2">
+                {% for symptom in feeder.symptoms.all %}
+                    {{ symptom }}
                 {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
+            </td>
+            <td class="col-md-3">
+                <a data-toggle="modal" data-target="#modal_repair_history_{{ feeder.id }}" title="Repair History" >
+                    <i class="glyphicon glyphicon-time"></i> History
+                </a>
+                <div class="modal fade" id="modal_repair_history_{{ feeder.id }}" role="dialog" >
+                    {% include 'feeder/modal-view-history.html' %}                     
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 {% else %}
 <div class="alert alert-info">
     There are no feeder currently listed.
@@ -57,9 +68,4 @@
 
 {% endif %}
 
-------------------------------------- Function to demo, will not be used in production ----------------------<br/>
-<a href="{% url 'feeder-add' %}" class="btn btn-default pull-right">Add a feeder</a>
-<a href="{% url 'location-add' %}" class="btn btn-default pull-right">New location</a>
-<a href="{% url 'status-add' %}" class="btn btn-default pull-right">New status</a>
-<a href="{% url 'feeder-type-add' %}" class="btn btn-default pull-right">New type</a>
 {% endblock %}

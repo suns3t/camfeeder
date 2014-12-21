@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+        $('.table').dataTable({
+            "dom": 'ftp',
+            "tableTools": {
+                "aButtons": [ "copy", "print" ],
+                "sSwfPath": "{{ STATIC }}DataTables-1.10.4/extensions/TableTools/swf/copy_csv_xls_pdf.swf"
+            },
+            "bInfo": false,
+            "bFilter": true,
+            "bLengthChange": false,
+        });
+    } );
+</script>
+    
+<h3 class="text-dark-green">META DATA: {{ metadata}}</h3>
+<p>{{ metadata }}</p>
+
+{% if has_data %}
+    {% if metadata == 'feeder-type' %}
+    <a href="{% url 'feeder-type-add' %}" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Feeder Type</a>
+    <table class="table table-striped table-bordered" id="feeder-type-table">
+        <thead>
+            <tr>
+                <th class="col-md-2">ID</th>
+                <th class="col-md-4">Feeder Type</th>
+                <th class="col-md-3">Who created</th>
+                <th class="col-md-3">Edit </th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for feeder_type in feeder_types %}
+            <tr>
+                <td class="col-md-2">{{ feeder_type.id }}</td>
+                <td class="col-md-4">{{ feeder_type.feeder_type }}</td>
+                <td class="col-md-3">{{ feeder_type.who_created }}</td>
+                <td class="col-md-3">
+                    <a  href="{% url 'feeder-type-edit' feeder_type.id %}">
+                        <span title="Edit"><i class="glyphicon glyphicon-edit"></i></span>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% elif metadata == 'location' %}
+    <a href="{% url 'location-add' %}" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Location</a>
+    <table class="table table-striped table-bordered" id="location-table">
+        <thead>
+            <tr>
+                <th class="col-md-2">ID</th>
+                <th class="col-md-4">Location</th>
+                <th class="col-md-3">Who created</th>
+                <th class="col-md-3">Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for location in locations %}
+            <tr>
+                <td class="col-md-2">{{ location.id }}</td>
+                <td class="col-md-4">{{ location.location }}</td>
+                <td class="col-md-3">{{ location.who_created }}</td>
+                <td class="col-md-3">
+                    <a  href="{% url 'location-edit' location.id %}">
+                        <span title="Edit"><i class="glyphicon glyphicon-edit"></i></span>
+                    </a>
+
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% elif metadata == 'symptom' %}
+    <a href="{% url 'symptom-add' %}" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Symptom</a>
+    <table class="table table-striped table-bordered" id="symptom-table">
+        <thead>
+            <tr>
+                <th class="col-md-2">ID</th>
+                <th class="col-md-4">Symptom</th>
+                <th class="col-md-3">Who created</th>
+                <th class="col-md-3">Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for symptom in symptoms %}
+            <tr>
+                <td class="col-md-2">{{ symptom.id }}</td>
+                <td class="col-md-4">{{ symptom.symptom }}</td>
+                <td class="col-md-3">{{ symptom.who_created }}</td>
+                <td class="col-md-3">
+                    <a href="{% url 'symptom-edit' symptom.id %}">
+                        <span title="Edit"><i class="glyphicon glyphicon-edit"></i></span>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}  
+<a href="{% url 'actiontaken-add' %}" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Action</a>
+    <table class="table table-striped table-bordered"  id="action-taken-table">
+        <thead>
+            <tr>
+                <th class="col-md-2">ID</th>
+                <th class="col-md-4">Action Taken</th>
+                <th class="col-md-3">Who created</th>
+                <th class="col-md-3">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for actiontaken in actiontakens %}
+            <tr>
+                <td class="col-md-2">{{ actiontaken.id }}</td>
+                <td class="col-md-4">{{ actiontaken.action }}</td>
+                <td class="col-md-3">{{ actiontaken.who_created }}</td>
+                <td class="col-md-3">
+                    <a href="{% url 'actiontaken-edit' actiontaken.id %}">
+                        <span title="Edit"><i class="glyphicon glyphicon-edit"></i></span>
+                    </a>  
+                    <a href="https://www.google.com">
+                        <span title="Delete"><i class="glyphicon glyphicon-remove"></i></span>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+{% else %}
+
+<div class="alert alert-info">
+    There are no {{ metadata }} currently listed.
+</div>
+{% endif %}
+    
+{% endblock %}

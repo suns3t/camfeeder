@@ -5,11 +5,16 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block page_title %}{{ page_title }}{% endblock %}</title>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
+        <script type="text/javascript" language="javascript" src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script> 
         <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/panel.css">
-        
+        <!--    Bootstrap for DataTable      -->
+        <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}DataTables-1.10.4/media/css/dataTables.bootstrap.css">
+        <!--    DataTable Jquery  -->
+        <script type="text/javascript" language="javascript" src="{{ STATIC_URL }}DataTables-1.10.4/media/js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" language="javascript" src="{{ STATIC_URL }}DataTables-1.10.4/media/js/dataTables.bootstrap.js"></script>
+        <script type="text/javascript" language="javascript" src="{{ STATIC_URL }}DataTables-1.10.4/extensions/TableTools/js/dataTables.tableTools.min.js"></script>
 
     </head>
     <body style="min-height: 700px">
@@ -23,49 +28,70 @@
         </div>
         <div id="wrap"  >
             <div class="container">
+
                 <div class="col-md-2">
-                        <div class="span2" role="navigation" ng-controller="TabController as tab">
-                            <ul class="nav nav-pills nav-stacked">
-                                <li>
-                                    Feeder
-                                </li>
-                                <li class="nav-divider"></li>
-                                <li>
-                                    <a href="{% url 'feeder-type-list' %}" class="tab">
-                                        <i class="glyphicon glyphicon-list-alt"></i>
-                                         Feeder Type
-                                    </a>
-                                </li>
-                                
-                                {% if user.is_active %}
-                                    {% if user.is_staff %}
-                                    <li>
-                                        <p>Hi, Admin <b class="text-dark-green">{% firstof user.get_full_name %}</b></p>
-                                    </li>
-                                    {% else %}
-                                    <li>
-                                        <p>Hi, <b class="text-dark-green">{{ user.first_name }} {{ user.last_name }}</b></p>
-                                    {% endif %}
-                                    <li>
-                                        <a href="{% url 'account-logout' %}" ><i class="glyphicon glyphicon-log-out"></i> Logout</a>
-                                    </li>
-                                {% else %}
-                                    <li>
-                                        <a href="{% url 'account-login' %}"><i class="glyphicon glyphicon-log-in"></i> Login</a>
-                                    </li>
+                    <div class="span2" role="navigation" ng-controller="TabController as tab">
+                        <ul class="nav nav-pills nav-stacked">
+                            <li>
+                                Feeder
+                            </li>
+                            <li>
+                                <a href="{% url 'feeder-dashboard' %}" class="tab">
+                                    <span class="glyphicon glyphicon-th"></span> Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-divider"></li>
+                            <li>
+                                Admin Area
+                            </li>
+                            <li>
+                                <a href="{% url 'feeder-type-list' %}" class="tab">
+                                    <i class="glyphicon glyphicon-list-alt"></i>
+                                    Feeder Type
+                                </a>
+                                <a href="{% url 'location-list' %}" class="tab">
+                                    <i class="glyphicon glyphicon-list-alt"></i>
+                                    Location
+                                </a>
+                                <a href="{% url 'symptom-list' %}" class="tab">
+                                    <i class="glyphicon glyphicon-list-alt"></i>
+                                    Symptom
+                                </a>
+                                <a href="{% url 'actiontaken-list' %}" class="tab">
+                                    <i class="glyphicon glyphicon-list-alt"></i>
+                                    Action Taken
+                                </a>
+                            </li>
+                            <li class="nav-divider"></li>
+                            {% if user.is_active %}
+                            {% if user.is_staff %}
+                            <li>
+                                <p>Hi, Admin <b class="text-dark-green">{% firstof user.get_full_name %}</b></p>
+                            </li>
+                            {% else %}
+                            <li>
+                                <p>Hi, <b class="text-dark-green">{{ user.first_name }} {{ user.last_name }}</b></p>
                                 {% endif %}
-                            </ul>
-                        </div>
+                            <li>
+                                <a href="{% url 'account-logout' %}" ><i class="glyphicon glyphicon-log-out"></i> Logout</a>
+                            </li>
+                            {% else %}
+                            <li>
+                                <a href="{% url 'account-login' %}"><i class="glyphicon glyphicon-log-in"></i> Login</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
                 </div>
-                <div class="col-md-10" style="border-left: 1px dotted #439339; padding-left: 20px; padding-bottom: 60px">
+                <div class="col-md-10">
                     {% if messages %}
-                        {% for message in messages %}
-                            <div {% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>
-                                <button type="button" class="close pull-right" data-dismiss="alert" aria-hidden="true">
-                                    ×</button>
-                                {{ message }}
-                            </div>
-                        {% endfor %}
+                    {% for message in messages %}
+                    <div {% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>
+                        <button type="button" class="close pull-right" data-dismiss="alert" aria-hidden="true">
+                            ×</button>
+                        {{ message }}
+                    </div>
+                    {% endfor %}
                     {% endif %}
                     {% block content %}{% endblock %}
                 </div>
