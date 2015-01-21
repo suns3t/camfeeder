@@ -1,4 +1,4 @@
-<div class="modal-dialog">
+<div class="modal-dialog" style="width: 50%">
     <div class="modal-content">
         <div class="modal-header bg-primary">
             <button type="button" class="close" data-dismiss="modal">×</button>
@@ -67,7 +67,6 @@ $(document).ready(function() {
             renderTo: 'graph_{{ feeder.id }}',
             type: 'line',
         },
-        title: {text: 'Feeder Health Graph'},
         xAxis: {
             type: 'datetime',
             title: {
@@ -81,7 +80,7 @@ $(document).ready(function() {
                 text: 'Number of error'
             },
             minRange: 0,
-            tickInterval: 1,
+            allowDecimals: false,
        
         },
         series: [{}],
@@ -100,7 +99,13 @@ $(document).ready(function() {
                     }
                 }
                 
-                countBySymptomByFeeder.chart.height = data['chart_data']['symptom'].length*50 + 100;
+                countBySymptomByFeeder.title = {
+                    text: data['chart_data']['title']
+                }
+                countBySymptomByFeeder.subtitle = {
+                    text: data['chart_data']['subtitle']
+                }
+                
                 var chart = new Highcharts.Chart(countBySymptomByFeeder);
             }
             else {

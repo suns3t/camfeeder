@@ -94,7 +94,6 @@ $(document).ready(function() {
             renderTo: 'chart_panel',
             type: 'column',
         },
-        title: {text: 'All Feeder Health Graph'},
         xAxis: {
             type: 'datetime',
             title: {
@@ -108,10 +107,14 @@ $(document).ready(function() {
                 text: 'Number of error'
             },
             min: 0,
-            
+            allowDecimals: false,
+        },
+        plotOptions: {
+            series: {
+                pointWidth: 15
+            }
         },
         series: [{}],
-        
         };
 
     var chartDataUrl = "{% url 'top_symptom_json' %}";
@@ -120,10 +123,17 @@ $(document).ready(function() {
             for (i=0; i<data['chart_data']['symptom'].length; i++) {
                 countBySymptom.series[i] = {
                     name: data['chart_data']['symptom'][i],
-                    data: data['chart_data']['data'][i]
+                    data: data['chart_data']['data'][i],
                 } 
             }
-            
+
+            countBySymptom.title = {
+                text: data['chart_data']['title']
+            }
+
+            countBySymptom.subtitle = {
+                text: data['chart_data']['subtitle']
+            }
             var chart = new Highcharts.Chart(countBySymptom);
 
     });
@@ -163,7 +173,13 @@ $(document).ready(function() {
                         data: data['chart_data']['data'][i]
                     } 
                 }
-                console.log("Success", data)
+                
+                countBySymptom.title = {
+                    text: data['chart_data']['title']
+                }
+                countBySymptom.subtitle = {
+                    text: data['chart_data']['subtitle']
+                }
                 var chart = new Highcharts.Chart(countBySymptom);
             },
             error: function(data) {

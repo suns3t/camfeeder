@@ -121,6 +121,8 @@ def top_symptom_json_by_feeder(request, feeder_id):
 def top_symptom_json_by_location_by_feeder_type(request):    
     params = request.POST
     
+#     import pdb; pdb.set_trace();
+    
     data = {}
     location = params['location']
     feeder_type = params['feeder_type']

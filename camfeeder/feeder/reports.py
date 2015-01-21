@@ -1,12 +1,17 @@
 from datetime import datetime, timedelta
 
-from .models import Transaction, Feeder, Symptom
+from .models import Transaction, Feeder, Symptom, FeederType, Location
 DATE_FORMAT = '%m/%d/%Y'
 
 class ChartData(object):
     @classmethod
     def get_data(cls, symptoms, transactions):
-        data = {'symptom': [], 'data': []}
+        data = {'symptom': [], 'data': [], 'title': [], 'subtitle': []}
+       
+        if symptoms == None:
+            return None
+        if transactions == None:
+            return None
         
         for symptom in symptoms:
             # Create a temp list to store array of date and number of error on that day
@@ -14,7 +19,10 @@ class ChartData(object):
             symptom.count = 0
             
             # Start with the latest data
-            symptom.date = datetime.date(Transaction.objects.filter(symptoms=symptom).first().timestamp)
+            try:
+                symptom.date = datetime.date(transactions.filter(symptoms=symptom).first().timestamp)
+            except:
+                continue
             for transaction in transactions:
                 temp_date = datetime.date(transaction.timestamp)
                 if symptom in transaction.symptoms.all():
@@ -41,25 +49,39 @@ class ChartData(object):
     @classmethod
     def get_count_by_symptom(cls, start_date=None, end_date=None):
         # Get all symptom
+        title = "All feeder's health graph"
         symptoms = Symptom.objects.all()
         if start_date and end_date:
             transactions = Transaction.objects.filter(timestamp__gte=start_date, timestamp__lte=end_date)
+            subtitle = "From " + start_date + " to " + end_date
         else:
             transactions = Transaction.objects.all()
+            subtitle = "In all time"
         
-        return ChartData.get_data(symptoms, transactions)
-    
+        data = ChartData.get_data(symptoms, transactions)
+        data['title'].append(title)
+        data['subtitle'].append(subtitle)
+        
+        return data
+        
     @classmethod
     def get_count_by_symptom_by_feeder(cls, feeder, start_date=None, end_date=None):
         # Get all symptoms
+        title = "Feeder " + feeder.barcode + " health graph"
         if start_date and end_date:
             transactions = Transaction.objects.filter(feeder=feeder,timestamp__gte=start_date, timestamp__lte=end_date)
+            subtitle = "From " + start_date + " to " + end_date
         else:
             transactions = Transaction.objects.by_feeder(feeder)
+            subtitle = "In all time"
         
         symptoms = Symptom.objects.all()
         
-        return ChartData.get_data(symptoms, transactions)
+        data = ChartData.get_data(symptoms, transactions)
+        data['title'].append(title)
+        data['subtitle'].append(subtitle)
+        
+        return data
     
     
     @classmethod
@@ -78,7 +100,6 @@ class ChartData(object):
     def get_count_by_location_by_feeder_type(cls, location=None, feeder_type=None, start_date=None, end_date=None):
         
         # Setup defaul value for parameters if they are not provided.
-#         import pdb; pdb.set_trace()
         if not start_date:
             start_date = (datetime.now() - timedelta(days=7)).date()
         else:
@@ -87,26 +108,39 @@ class ChartData(object):
             end_date = (datetime.now()).date()
         else:
             end_date = datetime.strptime(end_date, DATE_FORMAT)
+        subtitle = "From " + start_date.strftime(DATE_FORMAT) + " to " + end_date.strftime(DATE_FORMAT)
+
         if not location:
             location = 0
+        else:
+            location = Location.objects.get(id=location)
         if not feeder_type:
             feeder_type = 0
-        
+        else:
+            feeder_type = FeederType.objects.get(id=feeder_type)
+       
         # Load data
         symptoms = Symptom.objects.all()
-
+        
         if location == 0:
             if feeder_type == 0:
                 transactions = Transaction.objects.filter(timestamp__gte=start_date, timestamp__lte=end_date)
-                
+                title = "Feeder Health Graph for all feeder types, at all location"
             else:
                 transactions = Transaction.objects.filter(feeder_type=feeder_type,timestamp__gte=start_date, timestamp__lte=end_date)
+                title = "Feeder Health Graph for feeder type " + feeder_type.feeder_type + ", at all location" 
         else:
             if feeder_type == 0:
                 transactions = Transaction.objects.filter(location=location, timestamp__gte=start_date, timestamp__lte=end_date)
+                title = "Feeder Health Graph for all feeder types, at " + location.location
             else:
                 transactions = Transaction.objects.filter(location=location, feeder_type=feeder_type, timestamp__gte=start_date, timestamp__lte=end_date)
+                title = "Feeder Health Graph for feeder type " + feeder_type.feeder_type + ",at " + location.location
                 
-        return ChartData.get_data(symptoms, transactions)
+        data = ChartData.get_data(symptoms, transactions)
+        data['title'].append(title)
+        data['subtitle'].append(subtitle)
+
+        return data
             
             
